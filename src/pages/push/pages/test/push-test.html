@@ -1,0 +1,35 @@
+
+<h3>Send Push Notification</h3>
+<button *ngIf="!token" (click)="onClickRegisterPushNotification()">Register for Push</button>
+<button *ngIf="token" (click)="onClickRegisterPushNotification()">Unregister for Push</button>
+<div class="container">
+    <p>This device token: {{token}} </p>
+</div>
+<form>
+    <div class="form-group">
+        <label>Title</label>
+        <input type="text" class="form-control" name="pushTitle" [(ngModel)]="pushTitle">
+    </div>
+    <div class="form-group">
+        <label>Message</label>
+        <textarea class="form-control" name="pushMessage" [(ngModel)]="pushMessage" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Send to: </label>
+         <select class="form-control" name="pushSelectDevice" multiple [(ngModel)]="devices" (ngModelChange)="selectAllToggle()">
+            <option value="{{c.token}}" *ngFor="let c of container">
+                {{c.token}}
+            </option>   
+        </select>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="isChecked" [(ngModel)]="isChecked" (ngModelChange)="onClickSelectAll(isChecked)">
+                Send to All 
+            </label>
+        </div> 
+        <p id="validate" *ngIf="pushValidate">{{pushValidate}}</p>
+        <p id="validate" *ngIf="!pushValidate"></p>        
+    </div>
+</form>
+
+<button (click)="onClickSendPushNotification(devices)">Send Push</button>
