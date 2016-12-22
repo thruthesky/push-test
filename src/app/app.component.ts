@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+
+import { PushTestPage } from '../pages/push/pages/test/push-test';
+
 @Component({
   selector: `app-component`,
   template: `
@@ -15,8 +18,9 @@ import { Component } from '@angular/core';
 
 export class AppComponent {
   
-  constructor() {
+  constructor( private pushtest: PushTestPage ) {
     document.addEventListener("deviceready", () => this.onDevinceReady(), false);
+    this.pushtest.receivedPushNotification();
   }
   onDevinceReady() {
     console.log("yes, I am running in cordova.");
