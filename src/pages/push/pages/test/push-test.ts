@@ -8,14 +8,16 @@ import { Http, Headers, RequestOptions } from '@angular/http';
     })
     
 export class PushTestPage implements OnInit {
-
+    isRegistered:boolean = false;
     isChecked: boolean;
     pushTitle: string;    
     pushMessage: string;
     pushValidate: string;
     devices;
     deviceTokens;
+    deviceIDs;
     token;
+    id;
     pushToken: PushToken
     container = [];
 
@@ -33,7 +35,7 @@ export class PushTestPage implements OnInit {
 
     ngOnInit(){
         this.getTokens(); //Gets all valid tokens on initialize
-       
+        this.validateDevice();
     }
 
     //Received push notification
@@ -59,6 +61,13 @@ export class PushTestPage implements OnInit {
                         // console.log('Container : ', this.container );
                 });
             }, err => console.log( "Cannot get list of tokens. Error:  ", err ));
+    }
+
+    validateDevice(){
+        this.token = localStorage.getItem( 'token' );
+        if( !this.token ) return;
+        else this.isRegistered = true;
+        console.log( this.token );
     }
 
     // Validates user input and selection
@@ -89,30 +98,35 @@ export class PushTestPage implements OnInit {
 
     //Register for push notification
     onClickRegisterPushNotification(){
-        if( !this.pushToken ){
-            this.push.register()
+        if( !this.token ){
+            this.push.register() // Register device
                 .then( pushToken => {
                     alert( "Registration successful" );
-                    console.log( "Registration success" );
-                    return  this.push.saveToken( pushToken );
-                } ).then( ( pushToken ) => {
-                    this.pushToken = pushToken;
+                    return  this.push.saveToken( pushToken ); //Saves token to Ionic Cloud's database
+                } ).then( pushToken => {
                     this.token = pushToken.token;
-                    this.getTokens(); // Update list of registered tokens
-                    console.log("Token saved", pushToken.token);
+                    localStorage.setItem( 'token', pushToken.token ); //Saves token to device cache
+                    localStorage.setItem( 'id', pushToken.id ); //Saves ID to device cache
+                    this.isRegistered = true;                    
+                    this.getTokens(); //Update list of registered tokens
+                    console.log("Registration successful. Token saved", pushToken.token);
                 },  err => alert( "Registration failed. Error:  " + err ));
             return;
         }
-            this.push.unregister() 
+            this.push.unregister() //Unregister device
                 .then( pushToken => {
                     alert( "Successfully unregistered from push service." );
-                    console.log( "Successfully unregistered device. Deleting this device token: ", this.pushToken );
-                    this.http.delete( this.url + "push/tokens/" + this.pushToken.id , this.options )
-                        .subscribe( () => console.log( "Token deleted" ),
-                         err => console.log( "Cannot delete this device token. Error: " + err ) );
-                            this.token = "";
-                            this.pushToken = null;
-                            this.getTokens(); // Update list of registered tokens
+                    console.log( "Successfully unregistered device. Deleting this device token ID: ", this.id );
+                    this.id = localStorage.getItem( 'id' ); //Gets saved ID from the device cache              
+                    this.http.delete( this.url + "push/tokens/" + this.id , this.options ) //Deletes registered token from Ionic Cloud's database
+                        .subscribe( () => { 
+                            console.log( "Token deleted" ); 
+                            localStorage.removeItem('token'); //Removes saved token from device cache
+                            localStorage.removeItem('id'); //Removes saved ID from device cache                            
+                        }, err => console.log( "Cannot delete this device token. Error: " + err ) );
+                            this.token = null;
+                            this.isRegistered = false;                                                
+                            this.getTokens(); //Update list of registered tokens
                 }, err => alert( "Unregistered failed! Error:  " + err ));
         
     }
