@@ -1,9 +1,9 @@
 
 <h3>Send Push Notification</h3>
-<button *ngIf="!token" (click)="onClickRegisterPushNotification()">Register for Push</button>
-<button *ngIf="token" (click)="onClickRegisterPushNotification()">Unregister for Push</button>
+<button *ngIf="!isRegistered" (click)="onClickRegisterPushNotification()"> Register for Push</button>
+<button *ngIf="isRegistered" (click)="onClickRegisterPushNotification()">Unregister for Push</button>
 <div class="container">
-    <p>This device token: {{token}} </p>
+    <p>This device token: {{token}} </p>  
 </div>
 <form>
     <div class="form-group">
