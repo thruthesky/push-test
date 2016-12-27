@@ -12,14 +12,14 @@ const cloudSettings: CloudSettings = {
     'push': {
         'sender_id': '162492874903',
         'pluginConfig': {
-        'ios': {
-            'badge': true,
-            'sound': true
-        },
-        'android': {
-            'iconColor': '#343434'
+            'ios': {
+                'badge': true,
+                'sound': true
+            },
+            'android': {
+                'iconColor': '#343434'
+            }
         }
-        }   
     }
 };
 
